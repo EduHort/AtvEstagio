@@ -1,0 +1,27 @@
+body{
+    text-align: center;
+}
+
+.valor_total{
+    font-size: xx-large;
+}
+
+table{
+    margin: 0 auto;
+}
+
+caption{
+    caption-side: top;
+    text-align: left;
+    font-weight: bold;
+    font-size: xx-large;
+}
+
+th{
+    font-size: x-large;
+}
+
+td{
+    font-size: larger;
+    padding-left: 0%;
+}

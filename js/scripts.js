@@ -76,23 +76,41 @@ async function getValorProduto(id_produto) {
 // Função para adicionar uma linha na tabela com os dados do pedido
 function adicionarLinhaTabela(codigo_pedido, nome_cliente, data_pedido, valor_pedido) {
     try {
-        // Obter a referência da tabela
         var tbody = document.getElementById('corpo-tabela');
-
-        // Criar uma nova linha na tabela
         var novaLinha = document.createElement('tr');
-        novaLinha.innerHTML = '<td></td><td></td><td></td><td></td>';
+        
+        // Cria o link para as informações do pedido
+        var colunaCodigo = document.createElement('td');
+        var link = document.createElement('a');
+        link.href = `/pedido.html?id=${codigo_pedido}`;
+        link.innerText = codigo_pedido;
+        colunaCodigo.appendChild(link);
+
+        var colunaNomeCliente = document.createElement('td');
+        colunaNomeCliente.innerText = nome_cliente;
+        novaLinha.appendChild(colunaNomeCliente);
+
+        var colunaData = document.createElement('td');
+        colunaData.innerText = data_pedido;
+        novaLinha.appendChild(colunaData);
+
+        var colunaValor = document.createElement('td');
+        colunaValor.innerText = 'R$: ' + valor_pedido.toFixed(2);
+        novaLinha.appendChild(colunaValor);
+
+        // Adiciona as células à linha
+        novaLinha.appendChild(colunaCodigo);
+        novaLinha.appendChild(colunaNomeCliente);
+        novaLinha.appendChild(colunaData);
+        novaLinha.appendChild(colunaValor);
+
+        // Adiciona a linha ao corpo da tabela
         tbody.appendChild(novaLinha);
 
-        // Preencher os dados na nova linha da tabela
-        var ultimaLinha = tbody.lastElementChild;
-        ultimaLinha.children[0].innerText = codigo_pedido;
-        ultimaLinha.children[1].innerText = nome_cliente;
-        ultimaLinha.children[2].innerText = data_pedido;
-        ultimaLinha.children[3].innerText = valor_pedido;
     } catch (error) {
         console.error(error);
     }
 }
+
 
 getPedidos()

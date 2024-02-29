@@ -3,11 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Pedido</title>
     <link rel="stylesheet" href="css/style.css">
-    <script src="js/scripts.js" defer></script>
+    <script src="js/tabelas.js" defer></script>
 </head>
 <body>
-    Informações do pedido
+    <table border="1" class="tabela">
+        <caption id="infPedido">
+            <!--A caption será adicionada no tabelas-->
+        </caption>
+        <thead>
+            <tr>
+                <th colspan="4">Dados do cliente</th>
+            </tr>
+        </thead>
+        <tbody id="corpo-tabela-inf">
+            <!--As linhas da tabela e os seus conteúdos serão adicionados no tabelas-->
+        </tbody>
+    </table>
+    <table border="1" class="tabela">
+        <caption>Itens do pedido</caption>
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Produto</th>
+                <th>Quantidade</th>
+                <th>Valor</th>
+                <th>Valor Total</th>
+            </tr>
+        </thead>
+        <tbody id="corpo-tabela-itens">
+            <!--As linhas da tabela e os seus conteúdos serão adicionados no tabelas-->
+        </tbody>
+    </table>
 </body>
 </html>
