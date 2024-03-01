@@ -121,8 +121,8 @@ function adicionarLinhaTabelaItens(codigo, nome, quantidade, valor, valorTotal) 
         ultimaLinha.children[0].innerText = codigo;
         ultimaLinha.children[1].innerText = nome;
         ultimaLinha.children[2].innerText = quantidade;
-        ultimaLinha.children[3].innerText = 'RS: ' + valor.toFixed(2);
-        ultimaLinha.children[4].innerText = 'RS: ' + valorTotal.toFixed(2);
+        ultimaLinha.children[3].innerText = valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+        ultimaLinha.children[4].innerText = valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
     } catch (error) {
         console.error(error);
     }
@@ -130,10 +130,8 @@ function adicionarLinhaTabelaItens(codigo, nome, quantidade, valor, valorTotal) 
 
 function adicionarValorFinal(valor){
     try{
-        var novaDiv = document.createElement('div');
-        novaDiv.className = 'valor_total'
-        novaDiv.innerText = 'Total: R$ ' + valor.toFixed(2);
-        document.body.appendChild(novaDiv)
+        var valorFinal = document.getElementById('valorFinal');
+        valorFinal.textContent = 'Total: ' + valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
     } catch (error) {
         console.error(error);
@@ -145,7 +143,7 @@ function putIdPedido(id_pedido){
         var caption = document.getElementById('infPedido')
 
         if(caption){
-            caption.textContent = "Informações do pedido " + id_pedido
+            caption.textContent = "Informações do Pedido N° " + id_pedido
         }
 
     } catch (error) {

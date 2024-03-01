@@ -1,13 +1,13 @@
 body{
     text-align: center;
-}
-
-.valor_total{
-    font-size: xx-large;
+    margin: 50px;
 }
 
 table{
+    border-collapse: collapse;
+    width: 100%;
     margin: 0 auto;
+    margin-bottom: 100px;
 }
 
 caption{
@@ -19,9 +19,24 @@ caption{
 
 th{
     font-size: x-large;
+    padding: 5px;
+    background-color: rgb(173, 198, 204);
+    border-left: none;
+    border-right: none;
 }
 
 td{
     font-size: larger;
-    padding-left: 0%;
+    padding: 5px;
+    border-left: none;
+    border-right: none;
+}
+
+tfoot td{
+    font-size: xx-large;
+    text-align: right;
+}
+
+a{
+    color: blue;
 }

@@ -48,8 +48,7 @@ async function getPreco(id_pedido) {
 
         let valorTotal = 0;
         for (const pedido of pedidos) {
-            const valorProduto = await getValorProduto(pedido.produto);
-            valorTotal += pedido.quantidade * valorProduto;
+            valorTotal += pedido.quantidade * await getValorProduto(pedido.produto);
         }
 
         return valorTotal;
@@ -76,7 +75,7 @@ async function getValorProduto(id_produto) {
 // Função para adicionar uma linha na tabela com os dados do pedido
 function adicionarLinhaTabela(codigo_pedido, nome_cliente, data_pedido, valor_pedido) {
     try {
-        var tbody = document.getElementById('corpo-tabela');
+        var tbody = document.getElementById('corpo-tabela-pedidos');
         var novaLinha = document.createElement('tr');
         
         // Cria o link para as informações do pedido
@@ -95,7 +94,7 @@ function adicionarLinhaTabela(codigo_pedido, nome_cliente, data_pedido, valor_pe
         novaLinha.appendChild(colunaData);
 
         var colunaValor = document.createElement('td');
-        colunaValor.innerText = 'R$: ' + valor_pedido.toFixed(2);
+        colunaValor.innerText = valor_pedido.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
         novaLinha.appendChild(colunaValor);
 
         // Adiciona as células à linha
