@@ -69,7 +69,7 @@ function adicionarLinhaTabela(codigo_pedido, nome_cliente, data_pedido, valor_pe
         // Cria a célula para o código do pedido e adiciona um link para visualizar o pedido
         const colunaCodigo = document.createElement('td');
         const link = document.createElement('a');
-        link.href = `/pedido.html?id=${codigo_pedido}`;
+        link.href = `./pedido.html?id=${codigo_pedido}`;
         link.innerText = codigo_pedido;
         colunaCodigo.appendChild(link);
         novaLinha.appendChild(colunaCodigo);
