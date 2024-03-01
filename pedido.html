@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/tabelasPedido.js" defer></script>
+</head>
+<body>
+    <table border="1" id="tabela-cima">
+        <caption id="infPedido">
+            <!--A caption será adicionada no tabelasPedido-->
+        </caption>
+        <thead>
+            <tr>
+                <th colspan="4">Dados do cliente</th>
+            </tr>
+            <tr>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>Data Pedido</th>
+                <th>E-mail</th>
+            </tr>
+        </thead>
+        <tbody id="corpo-tabela-inf">
+            <!--As linhas da tabela e os seus conteúdos serão adicionados no tabelasPedido-->
+        </tbody>
+    </table>
+    <table border="1">
+        <caption>Itens do Pedido</caption>
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Produto</th>
+                <th>Quantidade</th>
+                <th>Valor</th>
+                <th>Valor Total</th>
+            </tr>
+        </thead>
+        <tbody id="corpo-tabela-itens">
+            <!--As linhas da tabela e os seus conteúdos serão adicionados no tabelasPedido-->
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" id="valorFinal">
+                    <!--O valor final do pedido será inserido no código no tabelasPedido-->
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>
