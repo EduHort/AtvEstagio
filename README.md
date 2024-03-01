@@ -7,3 +7,4 @@ Opiniões sobre a atividade:
 Como já tinha usado HTML, CSS e JS, decidi usar essas linguagens para fazer a atividade.
 As maiores dificuldades que tive foram com o desempenho do fetch, principalmente na hora de buscar as informações para a tabela da Lista de Pedidos.
 Usei algumas abordagens diferentes (Ver no branch master), mas ou a página carregava rápido com os pedidos em ordem aleatória, ou o contrário, que foi o que eu decidi usar.
+O resto foi tranquilo, com algumas coisas eu fazendo na mão e outras pesquisando na internet e adaptando para o programa.
