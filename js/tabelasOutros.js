@@ -1,65 +1,49 @@
 const url = 'https://sistemalift1.com/lift_ps/api';
 
+// Função genérica para buscar dados
+async function fetchData(recurso) {
+    try {
+        const response = await fetch(`${url}/${recurso}`);
+        if (!response.ok) {
+            throw new Error('Erro ao carregar os dados');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+// Função para buscar e adicionar clientes à tabela
 async function getClientes() {
-    try {
-        const response = await fetch(url + '/Clientes');
-        if (!response.ok) {
-            throw new Error('Erro ao carregar os dados');
-        }
-
-        const clientes = await response.json();
-
-        for (const cliente of clientes) {
-            adicionarLinhaTabelaClientes(cliente.id, cliente.nome, cliente.cpf, cliente.email);
-        }
-    } catch (error) {
-        console.error(error);
-    }
+    const clientes = await fetchData('Clientes');
+    clientes.forEach(cliente => adicionarLinhaTabelaClientes(cliente));
 }
 
+// Função para buscar e adicionar produtos à tabela
 async function getProdutos() {
+    const produtos = await fetchData('Produtos');
+    produtos.forEach(produto => adicionarLinhaTabelaProdutos(produto));
+}
+
+// Função para adicionar uma linha à tabela de clientes
+function adicionarLinhaTabelaClientes({ id, nome, cpf, email }) {
     try {
-        const response = await fetch(url + '/Produtos');
-        if (!response.ok) {
-            throw new Error('Erro ao carregar os dados');
-        }
-
-        const produtos = await response.json();
-
-        for (const produto of produtos) {
-            adicionarLinhaTabelaProdutos(produto.id, produto.nome, produto.valor);
-        }
+        const tbody = document.getElementById('corpo-tabela-clientes');
+        const novaLinha = document.createElement('tr');
+        novaLinha.innerHTML = `<td>${id}</td><td>${nome}</td><td>${cpf}</td><td>${email}</td>`;
+        tbody.appendChild(novaLinha);
     } catch (error) {
         console.error(error);
     }
 }
 
-function adicionarLinhaTabelaClientes(id, nome, cpf, email) {
+// Função para adicionar uma linha à tabela de produtos
+function adicionarLinhaTabelaProdutos({ id, nome, valor }) {
     try {
-        var tbody = document.getElementById('corpo-tabela-clientes');
-        var novaLinha = document.createElement('tr');
-        novaLinha.innerHTML = '<td></td><td></td><td></td><td></td>';
+        const tbody = document.getElementById('corpo-tabela-produtos');
+        const novaLinha = document.createElement('tr');
+        novaLinha.innerHTML = `<td>${id}</td><td>${nome}</td><td>${valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>`;
         tbody.appendChild(novaLinha);
-        var ultimaLinha = tbody.lastElementChild;
-        ultimaLinha.children[0].innerText = id;
-        ultimaLinha.children[1].innerText = nome;
-        ultimaLinha.children[2].innerText = cpf;
-        ultimaLinha.children[3].innerText = email;
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-function adicionarLinhaTabelaProdutos(id, nome, valor) {
-    try {
-        var tbody = document.getElementById('corpo-tabela-produtos');
-        var novaLinha = document.createElement('tr');
-        novaLinha.innerHTML = '<td></td><td></td><td></td>';
-        tbody.appendChild(novaLinha);
-        var ultimaLinha = tbody.lastElementChild;
-        ultimaLinha.children[0].innerText = id;
-        ultimaLinha.children[1].innerText = nome;
-        ultimaLinha.children[2].innerText = valor;
     } catch (error) {
         console.error(error);
     }

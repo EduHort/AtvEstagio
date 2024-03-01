@@ -1,19 +1,27 @@
 const url = 'https://sistemalift1.com/lift_ps/api';
 
-// Função assíncrona para obter os pedidos e atualizar a tabela
+// Função auxiliar para fazer requisições e tratar a resposta JSON
+async function fetchJSON(url) {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error('Erro ao carregar os dados');
+    }
+    return response.json();
+}
+
+// Função principal para obter os pedidos e atualizar a tabela
 async function getPedidos() {
     try {
-        const response = await fetch(url + '/Pedidos');
-        if (!response.ok) {
-            throw new Error('Erro ao carregar os dados');
-        }
-
-        const pedidos = await response.json();
+        const pedidos = await fetchJSON(`${url}/Pedidos`)
 
         for (const pedido of pedidos) {
-            const nome_cliente = await getNomeCliente(pedido.cliente);
-            const valor_pedido = await getPreco(pedido.id);
+            // Obtém o nome do cliente e o valor total do pedido de forma assíncrona
+            const [nome_cliente, valor_pedido] = await Promise.all([
+                getInfoById('Clientes', pedido.cliente, 'nome'),
+                calcularValorPedido(pedido.id)
+            ]);
 
+            // Adiciona uma linha à tabela com os dados do pedido
             adicionarLinhaTabela(pedido.id, nome_cliente, pedido.data, valor_pedido);
         }
     } catch (error) {
@@ -21,34 +29,28 @@ async function getPedidos() {
     }
 }
 
-// Função assíncrona para obter o nome do cliente pelo ID
-async function getNomeCliente(id_cliente) {
+// Função auxiliar para obter um recurso (cliente, produto, etc.) pelo seu ID
+async function getInfoById(info, id, resultado) {
     try {
-        const response = await fetch(url + '/Clientes/' + id_cliente);
-        if (!response.ok) {
-            throw new Error('Erro ao carregar os dados');
-        }
-
-        const cliente = await response.json();
-        return cliente.nome;
+        // Faz uma requisição para obter o recurso pelo seu ID
+        const response = await fetchJSON(`${url}/${info}/${id}`);
+        // Retorna o valor do campo específico desejado
+        return response[resultado];
     } catch (error) {
         console.error(error);
     }
 }
 
-// Função assíncrona para obter o preço total do pedido pelo ID
-async function getPreco(id_pedido) {
+// Função para calcular o valor total de um pedido
+async function calcularValorPedido(id_pedido) {
     try {
-        const response = await fetch(url + '/ItensPedido/' + id_pedido);
-        if (!response.ok) {
-            throw new Error('Erro ao carregar os dados');
-        }
-
-        const pedidos = await response.json();
-
+        const itens = await fetchJSON(`${url}/ItensPedido/${id_pedido}`);
         let valorTotal = 0;
-        for (const pedido of pedidos) {
-            valorTotal += pedido.quantidade * await getValorProduto(pedido.produto);
+
+        for (const item of itens) {
+            // Obtém o valor do produto associado ao item
+            const produto = await getInfoById('Produtos', item.produto, 'valor');
+            valorTotal += item.quantidade * produto;
         }
 
         return valorTotal;
@@ -57,59 +59,39 @@ async function getPreco(id_pedido) {
     }
 }
 
-// Função assíncrona para obter o valor do produto pelo ID
-async function getValorProduto(id_produto) {
-    try {
-        const response = await fetch(url + '/Produtos/' + id_produto);
-        if (!response.ok) {
-            throw new Error('Erro ao carregar os dados');
-        }
-
-        const produto = await response.json();
-        return produto.valor;
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-// Função para adicionar uma linha na tabela com os dados do pedido
+// Função para adicionar uma linha à tabela com os dados do pedido
 function adicionarLinhaTabela(codigo_pedido, nome_cliente, data_pedido, valor_pedido) {
     try {
-        var tbody = document.getElementById('corpo-tabela-pedidos');
-        var novaLinha = document.createElement('tr');
-        
-        // Cria o link para as informações do pedido
-        var colunaCodigo = document.createElement('td');
-        var link = document.createElement('a');
+        // Obtém o corpo da tabela
+        const tbody = document.getElementById('corpo-tabela-pedidos');
+        const novaLinha = document.createElement('tr');
+
+        // Cria a célula para o código do pedido e adiciona um link para visualizar o pedido
+        const colunaCodigo = document.createElement('td');
+        const link = document.createElement('a');
         link.href = `/pedido.html?id=${codigo_pedido}`;
         link.innerText = codigo_pedido;
         colunaCodigo.appendChild(link);
+        novaLinha.appendChild(colunaCodigo);
 
-        var colunaNomeCliente = document.createElement('td');
+        // Cria as células restantes
+        const colunaNomeCliente = document.createElement('td');
         colunaNomeCliente.innerText = nome_cliente;
         novaLinha.appendChild(colunaNomeCliente);
 
-        var colunaData = document.createElement('td');
+        const colunaData = document.createElement('td');
         colunaData.innerText = data_pedido;
         novaLinha.appendChild(colunaData);
 
-        var colunaValor = document.createElement('td');
-        colunaValor.innerText = valor_pedido.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+        const colunaValor = document.createElement('td');
+        colunaValor.innerText = valor_pedido.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         novaLinha.appendChild(colunaValor);
 
-        // Adiciona as células à linha
-        novaLinha.appendChild(colunaCodigo);
-        novaLinha.appendChild(colunaNomeCliente);
-        novaLinha.appendChild(colunaData);
-        novaLinha.appendChild(colunaValor);
-
-        // Adiciona a linha ao corpo da tabela
+        // Adiciona a nova linha ao corpo da tabela
         tbody.appendChild(novaLinha);
-
     } catch (error) {
         console.error(error);
     }
 }
 
-
-getPedidos()
+getPedidos();

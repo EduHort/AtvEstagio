@@ -1,154 +1,115 @@
 const url = 'https://sistemalift1.com/lift_ps/api';
 
-async function getInfoCliente(){
-    try{
-        const urlSearchParams = new URLSearchParams(window.location.search)
-        const id_Pedido = urlSearchParams.get("id")
+// Função auxiliar para fazer requisições e tratar a resposta JSON
+async function fetchJSON(url) {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error('Erro ao carregar os dados');
+    }
+    return response.json();
+}
 
-        const id_cliente = await getIdCliente(id_Pedido)
+// Função principal para obter as informações do cliente
+async function getInfoCliente() {
+    try {
+        // Obtém o ID do pedido da URL
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const id_Pedido = urlSearchParams.get("id");
 
-        var response = await fetch(url + '/Pedidos/' + id_Pedido);
-        if (!response.ok) {
-            throw new Error('Erro ao carregar os dados');
-        }
+        const id_cliente = await getIdCliente(id_Pedido);
 
-        const pedido = await response.json();
+        // Faz requisições para obter os endereços
+        const [pedido, cliente, itens] = await Promise.all([
+            fetchJSON(`${url}/Pedidos/${id_Pedido}`),
+            fetchJSON(`${url}/Clientes/${id_cliente}`),
+            fetchJSON(`${url}/ItensPedido/${id_Pedido}`)
+        ]);
 
-        var response = await fetch(url + '/Clientes/' + id_cliente);
-        if (!response.ok) {
-            throw new Error('Erro ao carregar os dados');
-        }
-
-        const cliente = await response.json();
-
-        adicionarLinhaTabelaInf(cliente.nome, cliente.cpf, pedido.data, cliente.email)
-        putIdPedido(id_Pedido)
-        await getItens(id_Pedido)
+        adicionarLinhaTabelaInf(cliente.nome, cliente.cpf, pedido.data, cliente.email);
+        putIdPedido(id_Pedido);
+        await processarItens(itens);
     } catch (error) {
         console.error(error);
     }
 }
 
-async function getItens(id_pedido){
+// Função assíncrona para processar os itens do pedido
+async function processarItens(itens) {
     try {
-        const response = await fetch(url + '/ItensPedido/' + id_pedido);
-        if (!response.ok) {
-            throw new Error('Erro ao carregar os dados');
+        let valorTotalFinal = 0;
+        for (const pedido of itens) {
+            const produto = await fetchJSON(`${url}/Produtos/${pedido.produto}`);
+
+            const valorTotalItem = pedido.quantidade * produto.valor;
+            valorTotalFinal += valorTotalItem;
+
+            adicionarLinhaTabelaItens(pedido.produto, produto.nome, pedido.quantidade, produto.valor, valorTotalItem);
         }
-
-        const pedidos = await response.json();
-
-        var valorTotalFinal = 0
-        for (const pedido of pedidos) {
-            const nomeProduto = await getNomeProd(pedido.produto)
-            const valorProduto = await getValorProduto(pedido.produto)
-            valorTotalFinal += pedido.quantidade * valorProduto
-            adicionarLinhaTabelaItens(pedido.produto, nomeProduto, pedido.quantidade, valorProduto, pedido.quantidade * valorProduto)
-        }
-
-        adicionarValorFinal(valorTotalFinal)
-
+        adicionarValorFinal(valorTotalFinal);
     } catch (error) {
         console.error(error);
     }
 }
 
-async function getNomeProd(id_produto){
+// Função assíncrona para obter o ID do cliente associado ao pedido
+async function getIdCliente(id_pedido) {
     try {
-        const response = await fetch(url + '/Produtos/' + id_produto);
-        if (!response.ok) {
-            throw new Error('Erro ao carregar os dados');
-        }
-
-        const produto = await response.json();
-        return produto.nome;
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-async function getValorProduto(id_produto) {
-    try {
-        const response = await fetch(url + '/Produtos/' + id_produto);
-        if (!response.ok) {
-            throw new Error('Erro ao carregar os dados');
-        }
-
-        const produto = await response.json();
-        return produto.valor;
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-async function getIdCliente(id_pedido){
-    try {
-        const response = await fetch(url + '/Pedidos/' + id_pedido);
-        if (!response.ok) {
-            throw new Error('Erro ao carregar os dados');
-        }
-
-        const pedido = await response.json();
+        const pedido = await fetchJSON(`${url}/Pedidos/${id_pedido}`);
         return pedido.cliente;
     } catch (error) {
         console.error(error);
     }
 }
 
+// Função para adicionar uma linha à tabela com informações do cliente
 function adicionarLinhaTabelaInf(nome, cpf, data_pedido, email) {
     try {
-        var tbody = document.getElementById('corpo-tabela-inf');
-        var novaLinha = document.createElement('tr');
-        novaLinha.innerHTML = '<td></td><td></td><td></td><td></td>';
+        // Obtém a referência do corpo da tabela
+        const tbody = document.getElementById('corpo-tabela-inf');
+        const novaLinha = document.createElement('tr');
+        // Define o conteúdo HTML da nova linha com as informações do cliente
+        novaLinha.innerHTML = `<td>${nome}</td><td>${cpf}</td><td>${data_pedido}</td><td>${email}</td>`;
         tbody.appendChild(novaLinha);
-        var ultimaLinha = tbody.lastElementChild;
-        ultimaLinha.children[0].innerText = nome;
-        ultimaLinha.children[1].innerText = cpf;
-        ultimaLinha.children[2].innerText = data_pedido;
-        ultimaLinha.children[3].innerText = email;
     } catch (error) {
         console.error(error);
     }
 }
 
+// Função para adicionar uma linha à tabela com informações dos itens do pedido
 function adicionarLinhaTabelaItens(codigo, nome, quantidade, valor, valorTotal) {
     try {
-        var tbody = document.getElementById('corpo-tabela-itens');
-        var novaLinha = document.createElement('tr');
-        novaLinha.innerHTML = '<td></td><td></td><td></td><td></td><td></td>';
+        // Obtém a referência do corpo da tabela de itens
+        const tbody = document.getElementById('corpo-tabela-itens');
+        const novaLinha = document.createElement('tr');
+
+        novaLinha.innerHTML = `<td>${codigo}</td><td>${nome}</td><td>${quantidade}</td><td>${valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td><td>${valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>`;
         tbody.appendChild(novaLinha);
-        var ultimaLinha = tbody.lastElementChild;
-        ultimaLinha.children[0].innerText = codigo;
-        ultimaLinha.children[1].innerText = nome;
-        ultimaLinha.children[2].innerText = quantidade;
-        ultimaLinha.children[3].innerText = valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-        ultimaLinha.children[4].innerText = valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
     } catch (error) {
         console.error(error);
     }
 }
 
-function adicionarValorFinal(valor){
-    try{
-        var valorFinal = document.getElementById('valorFinal');
-        valorFinal.textContent = 'Total: ' + valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-
+// Função para adicionar o valor total final na interface
+function adicionarValorFinal(valor) {
+    try {
+        // Obtém a referência do elemento HTML onde o valor final será exibido e converte o valor para BRL
+        const valorFinal = document.getElementById('valorFinal');
+        valorFinal.textContent = 'Total: ' + valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     } catch (error) {
         console.error(error);
     }
 }
 
-function putIdPedido(id_pedido){
-    try{
-        var caption = document.getElementById('infPedido')
-
-        if(caption){
-            caption.textContent = "Informações do Pedido N° " + id_pedido
+// Função para colocar o número do pedido no cabeçalho da primeira tabela
+function putIdPedido(id_pedido) {
+    try {
+        const local = document.getElementById('infPedido');
+        if (local) {
+            local.textContent = "Informações do Pedido N° " + id_pedido;
         }
-
     } catch (error) {
         console.error(error);
     }
 }
 
-getInfoCliente()
+getInfoCliente();
